@@ -17,34 +17,60 @@ class PasswordManager:
 
         self.root=root
         
-        self.label1 = Label(self.root, text = "Welcome to Password Manager!\n")
-        self.label2 = Label(self.root, text = "Please enter master password to gain access")
+        self.label1 = Label(self.root, text = "Please enter master password to gain access")
 
         self.master_pass = Entry(self.root, show = '*', width = 35)
         self.submit_button = Button(self.root, text = "Submit", command = self.submit)
 
         self.Access_check()
 
+# MAIN MENU
+        self.label2 = Label(self.root, text = "Welcome to Password Manager!\n")
+
+        self.store_passw_btn = Button(self.root, text = "Store Password", command = self.store_passw)
+        self.get_passw_btn = Button(self.root, text = "Get Password", command = self.get_passw)
+        self.exit_btn = Button(self.root, text = "Exit", command = self.exit)
+        
+
+
+
+
+
 # 2. COMMAND FUNCTIONS.
     def submit(self):
         MPget = self.master_pass.get()
         if MPget == self.ADMIN_PASSWORD:
             self.Access_forget()
-            self.label1.pack()
+            self.main_menu()
         else:
-            self.label4 = Label(self.root, text = "Wrong Password!").pack()
+            self.label3 = Label(self.root, text = "Wrong Password!").pack()
+
+    def store_passw(self):
+        pass
+
+    def get_passw(self):
+        pass
+
+    def exit(self):
+        self.root.destroy()
 
 
 # 3. VIEWS
     def Access_check(self):
-        self.label2.pack(pady = 5)
+        self.label1.pack(pady = 5, padx=10)
         self.master_pass.pack(pady = 4)
         self.submit_button.pack(pady = 4)
 
+    def main_menu(self):
+        self.label2.pack()
+        self.store_passw_btn.pack()
+        self.get_passw_btn.pack()
+        self.exit_btn.pack(pady = 10)
 
-# 4. REMOVE FUNCTIONS
+
+# 4. REMOVE VIEWS FUNCTIONS
     def Access_forget(self):
-        self.label2.pack_forget()
+        self.label1.pack_forget()
         self.master_pass.pack_forget()
         self.submit_button.pack_forget()
 
