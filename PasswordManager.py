@@ -1,6 +1,6 @@
 import sys
 from tkinter import *
-
+import sqlite3
 
 class PasswordManager:
     
@@ -27,29 +27,70 @@ class PasswordManager:
 # MAIN MENU
         self.label2 = Label(self.root, text = "Welcome to Password Manager!\n")
 
-        self.store_passw_btn = Button(self.root, text = "Store Password", command = self.store_passw)
+        self.store_passw_btn = Button(self.root, text = "Store Password", command = self.store_passw) #change function name
         self.get_passw_btn = Button(self.root, text = "Get Password", command = self.get_passw)
         self.exit_btn = Button(self.root, text = "Exit", command = self.exit)
         
+# DB call
+        self.conn = sqlite3.connect("password_manager.db")
 
-
+# db functions
+        self.service_entry = Entry(self.root)
+        self.service = self.service_entry.get()
+        self.test_submit = Button(self.root, text = "insert into db", command = self.add_to_db)
 
 
 
 # 2. COMMAND FUNCTIONS.
     def submit(self):
         MPget = self.master_pass.get()
+        #self.wrong_passwd = ["Yes", "No"]
+        #self.wp_current_status = []
         if MPget == self.ADMIN_PASSWORD:
+            try:
+                self.conn.execute(''' 
+                CREATE TABLE PASSKEYS (
+                    SERVICE TEXT PRIMARY KEY NOT NULL,
+                    PASSWD TEXT VARCHAR(100)
+                );
+                ''')
+            except:
+                pass
+            
             self.Access_forget()
             self.main_menu()
         else:
-            self.label3 = Label(self.root, text = "Wrong Password!").pack()
+            self.label3 = Label(self.root, text = "Wrong Password!")
+            try:
+                self.label3.pack()
+
+            except:
+                pass
+
+            #self.wp_current_status = self.wrong_passwd[0]
+            #for x in self.wrong_passwd:
+                #if x in self.wp_current_status:
+                    #self.label3.pack()
+                    #print("1 - " + str(self.wrong_passwd))
+                #elif x == 1:
+                    #pass
+                #else:
+                    #print("2 - " + str(self.wrong_passwd))
+                    #pass
 
     def store_passw(self):
-        pass
+        self.service_entry.pack()
+        self.test_submit.pack()
+
+
+    def add_to_db(self):
+        self.command = "INSERT INTO PASSKEYS (SERVICE) VALUES (%s);" %('"' + str(self.service) + '"')
+        self.conn.execute(self.command)
 
     def get_passw(self):
-        pass
+        self.command2 = "SELECT * from PASSKEYS"
+        self.test_get = self.conn.execute(self.command2)
+        print(self.test_get)
 
     def exit(self):
         self.root.destroy()
