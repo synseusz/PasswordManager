@@ -32,11 +32,14 @@ class PasswordManager:
         self.exit_btn = Button(self.root, text = "Exit", command = self.exit)
         
 # DB call
-        self.conn = sqlite3.connect("password_manager.db")
-
+        try:
+            self.conn = sqlite3.connect("password_manager.db")
+        except:
+            pass
+        
 # db functions
+        self.cursor = self.conn.cursor()
         self.service_entry = Entry(self.root)
-        self.service = self.service_entry.get()
         self.test_submit = Button(self.root, text = "insert into db", command = self.add_to_db)
 
 
@@ -48,12 +51,12 @@ class PasswordManager:
         #self.wp_current_status = []
         if MPget == self.ADMIN_PASSWORD:
             try:
-                self.conn.execute(''' 
+                self.cursor.execute(''' 
                 CREATE TABLE PASSKEYS (
-                    SERVICE TEXT PRIMARY KEY NOT NULL,
                     PASSWD TEXT VARCHAR(100)
                 );
-                ''')
+                ''') 
+
             except:
                 pass
             
@@ -84,13 +87,21 @@ class PasswordManager:
 
 
     def add_to_db(self):
-        self.command = "INSERT INTO PASSKEYS (SERVICE) VALUES (%s);" %('"' + str(self.service) + '"')
-        self.conn.execute(self.command)
+        self.service = self.service_entry.get()
+
+        self.command = "INSERT INTO PASSKEYS(PASSWD) VALUES(?);"
+        self.cursor.execute(self.command, [self.service])
+        self.conn.commit()
 
     def get_passw(self):
-        self.command2 = "SELECT * from PASSKEYS"
-        self.test_get = self.conn.execute(self.command2)
-        print(self.test_get)
+        self.cursor = self.conn.cursor()
+        self.command2 = "SELECT * FROM 'PASSKEYS';"
+        self.test_get = self.cursor.execute(self.command2)
+        
+        self.results = self.cursor.fetchall()
+
+        for x in self.results:
+            print(x)
 
     def exit(self):
         self.root.destroy()
