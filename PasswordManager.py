@@ -28,7 +28,7 @@ class PasswordManager:
 # MAIN MENU
         self.label2 = Label(self.root, text = "Welcome to Password Manager!")
 
-        self.store_passw_btn = Button(self.root, text = "Store Password", command = self.store_passw) #change function name
+        self.store_passw_btn = Button(self.root, text = "Store Password", command = self.store_passwd_menu) #change function name
         self.get_passw_btn = Button(self.root, text = "Get Password", command = self.get_passw)
         self.exit_btn = Button(self.root, text = "Exit", command = self.exit)
         
@@ -49,12 +49,12 @@ class PasswordManager:
         self.label4 = Label(self.root, text = "Enter password")
         self.passw_entry = Entry(self.root, show = "*")
 
-        self.store_passw = Button(self.root, text = "Store password", command = self.add_to_db)
+        self.store_passw_btn2 = Button(self.root, text = "Store password", command = self.add_to_db)
         
         self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
-
-
+# All passwd menu
+        self.label5 = Label(self.root, text = "Password Storage")
 
 # 2. COMMAND FUNCTIONS.
     def submit(self):
@@ -83,7 +83,8 @@ class PasswordManager:
                 pass
 
     def store_passw(self):
-        self.store_passwd_menu()
+        pass
+        #self.store_passwd_menu()
 
 
     def add_to_db(self):
@@ -95,16 +96,19 @@ class PasswordManager:
         self.conn.commit()
 
         # Unique service name check
-        self.query = "SELECT SERVICE FROM PASSKEYS;"
-        self.cursor.execute(self.query)
+        #self.query = "SELECT SERVICE FROM PASSKEYS;"
+        #self.cursor.execute(self.query)
 
-        self.results = self.cursor.fetchall()
+        #self.results = self.cursor.fetchall()
 
-        for x in [self.results]:
-            if x == self.service_entry.get():
-                self.error_label2.pack()
-            else:
-                pass
+        #for x in [self.results]:
+            #if x == self.service_entry.get():
+                #self.error_label2.pack()
+            #else:
+                #pass
+
+        self.store_passwd_menu_forget()
+        self.all_passwd_menu()
 
     def get_passw(self):
         self.command2 = "SELECT * FROM 'PASSKEYS';"
@@ -114,6 +118,17 @@ class PasswordManager:
 
         for x in self.results:
             print(x)
+
+
+    def test(self):
+        self.query = "SELECT SERVICE FROM PASSKEYS;"
+        self.cursor.execute(self.query)
+
+        self.results = self.cursor.fetchall()
+
+        for x in self.results:
+            self.service_btn = Button(self.root, text = x, width = 25, command = None)
+            self.service_btn.pack()
 
     def exit(self):
         self.root.destroy()
@@ -137,7 +152,11 @@ class PasswordManager:
         self.service_entry.pack()
         self.label4.pack(pady = 6)
         self.passw_entry.pack()
-        self.store_passw.pack(pady = 5)
+        self.store_passw_btn2.pack(pady = 5)
+
+    def all_passwd_menu(self):
+        self.label5.pack()
+        self.test()
 
 
 # 4. REMOVE VIEWS FUNCTIONS
@@ -152,6 +171,13 @@ class PasswordManager:
         self.store_passw_btn.pack_forget()
         self.get_passw_btn.pack_forget()
         self.exit_btn.pack_forget()
+
+    def store_passwd_menu_forget(self):
+        self.label3.pack_forget()
+        self.service_entry.pack_forget()
+        self.label4.pack_forget()
+        self.passw_entry.pack_forget()
+        self.store_passw_btn2.pack_forget()
 
     #######################################################################
     #                             MAIN CONFIG                             #
