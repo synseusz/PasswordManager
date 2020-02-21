@@ -68,7 +68,8 @@ class PasswordManager:
             try:
                 self.cursor.execute(''' 
                 CREATE TABLE PASSKEYS (
-                    SERVICE TEXT PRIMARY KEY NOT NULL,
+                    ID INTEGER PRIMARY KEY,
+                    SERVICE TEXT VARCHAR(100) NOT NULL,
                     PASSWD TEXT VARCHAR(100)
                 );
                 ''') 
@@ -129,14 +130,14 @@ class PasswordManager:
 
         self.results = self.cursor.fetchall()
         self.results_length = len(self.results)
-        
-        for y in self.results:
-            self.service_btn = Button(self.root, text = y, width = 50, command = lambda: self.get_passwd(y))
-            for x in range(self.results_length):
-                self.service_btn.pack(pady = 4)
-            #self.service_btn.
+        print(self.results)
 
-        
+        for x, y in enumerate(self.results):
+            print(str(x) + " " + str(y))
+            self.service_btn = Button(self.root, text = y, width = 50, command = lambda: self.get_passwd(y))
+            self.service_btn.pack(pady = 4)
+
+
 
     def get_passwd(self, service):        
         #self.all_widgets = self.root.pack_slaves()
@@ -148,9 +149,10 @@ class PasswordManager:
 
         self.results = self.cursor.fetchall()
         self.label6.pack()
+        self.string = "The password for %s is: " % (service)
+        print(self.string + str(self.results))
 
         for x in self.results:
-            print(x)
             self.passwd_label = Label(self.root, text = x, font = ("Helvetica", 15, "bold"))
             self.passwd_label.pack(pady = 4)
         self.exit_btn.pack()
