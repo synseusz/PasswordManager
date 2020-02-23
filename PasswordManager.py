@@ -68,7 +68,6 @@ class PasswordManager:
             try:
                 self.cursor.execute(''' 
                 CREATE TABLE PASSKEYS (
-                    ID INTEGER PRIMARY KEY,
                     SERVICE TEXT VARCHAR(100) NOT NULL,
                     PASSWD TEXT VARCHAR(100)
                 );
@@ -77,7 +76,7 @@ class PasswordManager:
             except:
                 pass
             
-            self.Access_forget()
+            self.clear()
             self.main_menu()
         else:
             try:
@@ -132,20 +131,19 @@ class PasswordManager:
         self.results_length = len(self.results)
         print(self.results)
 
-        for x, y in enumerate(self.results):
-            print(str(x) + " " + str(y))
-            self.service_btn = Button(self.root, text = y, width = 50, command = lambda: self.get_passwd(y))
+        for service in self.results:
+            self.service_btn = Button(self.root, text = service, width = 50, command = lambda s=service: self.get_passwd(s))
             self.service_btn.pack(pady = 4)
 
 
+    def get_passwd(self, service):
+        self.clear()
 
-    def get_passwd(self, service):        
-        #self.all_widgets = self.root.pack_slaves()
-        #for w in self.all_widgets:
-            #w.destroy()
+        self.service = service[0]
+        #print(self.service)
 
         self.query2 = "SELECT PASSWD FROM PASSKEYS WHERE SERVICE = ?;"
-        self.cursor.execute(self.query2, service)
+        self.cursor.execute(self.query2, [self.service])
 
         self.results = self.cursor.fetchall()
         self.label6.pack()
@@ -169,6 +167,7 @@ class PasswordManager:
         self.submit_button.pack(pady = 4)
 
     def main_menu(self):
+        self.clear()
         self.label2.pack(padx = 10, pady = 10)
         self.store_passw_btn.pack()
         self.get_passw_btn.pack()
@@ -190,11 +189,12 @@ class PasswordManager:
 
 
 # 4. REMOVE VIEWS FUNCTIONS
-    def Access_forget(self):
-        self.label1.pack_forget()
-        self.error_label.pack_forget()
-        self.master_pass.pack_forget()
-        self.submit_button.pack_forget()
+    def clear(self):
+        self.all_widgets = self.root.pack_slaves()
+        for w in self.all_widgets:
+            w.destroy()
+
+ 
 
     def main_menu_forget(self):
         self.label2.pack_forget()
