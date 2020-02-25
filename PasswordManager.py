@@ -57,7 +57,7 @@ class PasswordManager:
         self.label5 = Label(self.root, text = "Password Storage", font = ("Arial", 14, "bold"))
 
 # Get passwd menu
-        self.label6 = Label(self.root, text = "Your password is")
+        self.backBtn = Button(self.root, text = "Back", command = self.all_passwd_menu)
 
 # 2. COMMAND FUNCTIONS.
     def submit(self):
@@ -76,7 +76,6 @@ class PasswordManager:
             except:
                 pass
             
-            self.clear()
             self.main_menu()
         else:
             try:
@@ -109,7 +108,6 @@ class PasswordManager:
         #else:
             #pass
 
-        self.store_passwd_menu_forget()
         self.all_passwd_menu()
 
     def get_safe_status(self):
@@ -146,13 +144,18 @@ class PasswordManager:
         self.cursor.execute(self.query2, [self.service])
 
         self.results = self.cursor.fetchall()
-        self.label6.pack()
+
         self.string = "The password for %s is: " % (service)
+        self.label6 = Label(self.root, text = self.string)
+        self.label6.pack()
+
         print(self.string + str(self.results))
 
         for x in self.results:
             self.passwd_label = Label(self.root, text = x, font = ("Helvetica", 15, "bold"))
             self.passwd_label.pack(pady = 4)
+
+        self.backBtn.pack()
         self.exit_btn.pack()
 
     def exit(self):
@@ -174,7 +177,7 @@ class PasswordManager:
         self.exit_btn.pack(pady = 10)
 
     def store_passwd_menu(self):
-        self.main_menu_forget()
+        self.clear()
         self.label3.pack(padx = 10, pady = 10)
         self.service_entry.pack()
         self.label4.pack(pady = 6)
@@ -182,37 +185,17 @@ class PasswordManager:
         self.store_passw_btn2.pack(pady = 5)
 
     def all_passwd_menu(self):
-        self.main_menu_forget()
+        self.clear()
         self.label5.pack()
         self.get_safe_status()
         self.get_services()
 
 
-# 4. REMOVE VIEWS FUNCTIONS
+# CLEAR ALL CURRENTLY DISPLAYED WIDGETS
     def clear(self):
         self.all_widgets = self.root.pack_slaves()
         for w in self.all_widgets:
-            w.destroy()
-
- 
-
-    def main_menu_forget(self):
-        self.label2.pack_forget()
-        self.store_passw_btn.pack_forget()
-        self.get_passw_btn.pack_forget()
-        self.exit_btn.pack_forget()
-
-    def store_passwd_menu_forget(self):
-        self.label3.pack_forget()
-        self.service_entry.pack_forget()
-        self.label4.pack_forget()
-        self.passw_entry.pack_forget()
-        self.store_passw_btn2.pack_forget()
-
-    def all_passwd_menu_forget(self):
-        self.label5.pack_forget()
-        self.safe_status_label.pack_forget()
-        self.service_btn.pack_forget()
+            w.pack_forget()
 
 
     #######################################################################
