@@ -11,27 +11,10 @@ class PasswordManager:
     #                        LABELS AND BUTTONS                           #     
     #######################################################################
 
-
-# 1. MASTER PASSWORD PROMPT.
         self.ADMIN_PASSWORD = "1234"
 
         self.root=root
-        
-        self.label1 = Label(self.root, text = "Please enter master password to gain access")
 
-        self.master_pass = Entry(self.root, show = '*', width = 35)
-        self.submit_button = Button(self.root, text = "Submit", command = self.submit)
-        self.error_label = Label(self.root, text = "Wrong Password!")
-
-        self.Access_check()
-
-# MAIN MENU
-        self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
-
-        self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
-        self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
-        self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
-        
 # DB call
         try:
             self.conn = sqlite3.connect("password_manager.db")
@@ -40,6 +23,37 @@ class PasswordManager:
         
 # DB cursor
         self.cursor = self.conn.cursor()
+
+# MASTER PASSWORD SETUP
+        self.MPsetupLabel = Label(self.root, text = "Setup your new Master Password")
+        self.MP = Entry(self.root, show = '*', width = 35)
+
+        try:
+            self.cursor.execute(''' 
+            CREATE TABLE MasterPasswd (
+                MP TEXT VARCHAR(100) NOT NULL
+            );
+            ''') 
+
+        except:
+            pass
+
+# MASTER PASSWORD PROMPT  
+        self.label1 = Label(self.root, text = "Please enter master password to gain access")
+
+        self.master_pass = Entry(self.root, show = '*', width = 35)
+        self.submit_button = Button(self.root, text = "Submit", command = self.submit)
+        self.error_label = Label(self.root, text = "Wrong Password!")
+
+        self.MP_check()
+        #self.Access_check()
+
+# MAIN MENU
+        self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
+
+        self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
+        self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
+        self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
 
 
 # Service & Password entries
@@ -50,7 +64,6 @@ class PasswordManager:
         self.passw_entry = Entry(self.root, show = "*")
 
         self.store_passw_btn2 = Button(self.root, text = "Store password", command = self.add_to_db)
-        #self.
         
         self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
@@ -62,6 +75,24 @@ class PasswordManager:
         self.back_btn2 = Button(self.root, text = "Back", width = 15, command = self.all_passwd_menu)
 
 # 2. COMMAND FUNCTIONS.
+
+    def MP_check(self):
+        self.MP_check_query = "SELECT * FROM MasterPasswd;"
+        self.cursor.execute(self.MP_check_query)
+        
+        self.results = self.cursor.fetchall()
+        self.results_lenght = len(self.results)
+
+
+        if self.results_lenght == 0:
+            self.master_password_setup()
+        elif self.results_lenght == 1:
+            self.Access_check()
+        else:
+            print(self.results_lenght)
+
+
+
     def submit(self):
         self.MPget = self.master_pass.get()
         #self.wrong_passwd = ["Yes", "No"]
@@ -168,6 +199,11 @@ class PasswordManager:
 
 
 # 3. VIEWS
+
+    def master_password_setup(self):
+        self.MPsetupLabel.pack(pady = 5, padx=10)
+        self.MP.pack(pady = 4)
+
     def Access_check(self):
         self.label1.pack(pady = 5, padx=10)
         self.master_pass.pack(pady = 4)
