@@ -30,7 +30,7 @@ class PasswordManager:
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
         self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
-        self.exit_btn = Button(self.root, text = "Exit", width = 6, command = self.exit)
+        self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
         
 # DB call
         try:
@@ -55,16 +55,17 @@ class PasswordManager:
 
 # All passwd menu
         self.label5 = Label(self.root, text = "Password Storage", font = ("Arial", 14, "bold"))
+        self.back_btn = Button(self.root, text = "Back", width = 15, command = self.main_menu)
 
 # Get passwd menu
-        self.backBtn = Button(self.root, text = "Back", command = self.all_passwd_menu)
+        self.back_btn2 = Button(self.root, text = "Back", width = 15, command = self.all_passwd_menu)
 
 # 2. COMMAND FUNCTIONS.
     def submit(self):
-        MPget = self.master_pass.get()
+        self.MPget = self.master_pass.get()
         #self.wrong_passwd = ["Yes", "No"]
         #self.wp_current_status = []
-        if MPget == self.ADMIN_PASSWORD:
+        if self.MPget == self.ADMIN_PASSWORD:
             try:
                 self.cursor.execute(''' 
                 CREATE TABLE PASSKEYS (
@@ -83,11 +84,6 @@ class PasswordManager:
 
             except:
                 pass
-
-    def store_passw(self):
-        pass
-        #self.store_passwd_menu()
-
 
     def add_to_db(self):
         self.service = self.service_entry.get()
@@ -151,12 +147,19 @@ class PasswordManager:
 
         print(self.string + str(self.results))
 
-        for x in self.results:
-            self.passwd_label = Label(self.root, text = x, font = ("Helvetica", 15, "bold"))
+        for password in self.results:
+            self.passwd_label = Label(self.root, text = password, font = ("Helvetica", 15, "bold"))
             self.passwd_label.pack(pady = 4)
-
-        self.backBtn.pack()
-        self.exit_btn.pack()
+            self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=password: self.copy_to_clipboard(pw))
+            self.copy_btn.pack()
+            
+        self.back_btn2.pack(side = LEFT, padx = 10, pady = 10)
+        self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
+    
+    def copy_to_clipboard(self, password):
+        self.password = password[0]
+        self.root.clipboard_clear()
+        self.root.clipboard_append(self.password)
 
     def exit(self):
         self.conn.close()
@@ -189,6 +192,8 @@ class PasswordManager:
         self.label5.pack()
         self.get_safe_status()
         self.get_services()
+        self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
+        self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
 
 
 # CLEAR ALL CURRENTLY DISPLAYED WIDGETS
