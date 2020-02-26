@@ -50,6 +50,7 @@ class PasswordManager:
         self.passw_entry = Entry(self.root, show = "*")
 
         self.store_passw_btn2 = Button(self.root, text = "Store password", command = self.add_to_db)
+        #self.
         
         self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
@@ -186,6 +187,8 @@ class PasswordManager:
         self.label4.pack(pady = 6)
         self.passw_entry.pack()
         self.store_passw_btn2.pack(pady = 5)
+        self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
+        self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
 
     def all_passwd_menu(self):
         self.clear()
