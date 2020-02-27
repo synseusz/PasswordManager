@@ -27,6 +27,7 @@ class PasswordManager:
 # MASTER PASSWORD SETUP
         self.MPsetupLabel = Label(self.root, text = "Setup your new Master Password")
         self.MP = Entry(self.root, show = '*', width = 35)
+        self.MPsubmit = Button(self.root, text = "Submit", command = self.add_MP_to_db)
 
         try:
             self.cursor.execute(''' 
@@ -83,7 +84,6 @@ class PasswordManager:
         self.results = self.cursor.fetchall()
         self.results_lenght = len(self.results)
 
-
         if self.results_lenght == 0:
             self.master_password_setup()
         elif self.results_lenght == 1:
@@ -91,13 +91,29 @@ class PasswordManager:
         else:
             print(self.results_lenght)
 
+    def add_MP_to_db(self):
+        self.MPget = self.MP.get()
+        print(self.MPget)
 
+        self.MPinsertQuery = "INSERT INTO MasterPasswd(MP) VALUES(?);"
+        self.cursor.execute(self.MPinsertQuery, [self.MPget])
+        self.conn.commit()
+
+        self.MP_check()
 
     def submit(self):
-        self.MPget = self.master_pass.get()
-        #self.wrong_passwd = ["Yes", "No"]
-        #self.wp_current_status = []
-        if self.MPget == self.ADMIN_PASSWORD:
+        self.master_pass_get = self.master_pass.get()
+       
+        self.MP_get_query = "SELECT * FROM MasterPasswd;"
+        self.cursor.execute(self.MP_get_query)
+        
+        self.results = self.cursor.fetchall()
+        #print(self.results)
+
+        #for MP in self.results:
+        print(self.results[0])
+            
+        if self.master_pass_get == "1234":
             try:
                 self.cursor.execute(''' 
                 CREATE TABLE PASSKEYS (
@@ -158,6 +174,7 @@ class PasswordManager:
         print(self.results)
 
         for service in self.results:
+            print("elko2" + str(service))
             self.service_btn = Button(self.root, text = service, width = 50, command = lambda s=service: self.get_passwd(s))
             self.service_btn.pack(pady = 4)
 
@@ -203,8 +220,10 @@ class PasswordManager:
     def master_password_setup(self):
         self.MPsetupLabel.pack(pady = 5, padx=10)
         self.MP.pack(pady = 4)
+        self.MPsubmit.pack()
 
     def Access_check(self):
+        self.clear()
         self.label1.pack(pady = 5, padx=10)
         self.master_pass.pack(pady = 4)
         self.submit_button.pack(pady = 4)
