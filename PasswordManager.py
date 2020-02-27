@@ -108,30 +108,30 @@ class PasswordManager:
         self.cursor.execute(self.MP_get_query)
         
         self.results = self.cursor.fetchall()
-        #print(self.results)
 
-        #for MP in self.results:
-        print(self.results[0])
+        for MP in self.results:
+            self.MP = MP[0]
+            print(self.MP)
             
-        if self.master_pass_get == "1234":
-            try:
-                self.cursor.execute(''' 
-                CREATE TABLE PASSKEYS (
-                    SERVICE TEXT VARCHAR(100) NOT NULL,
-                    PASSWD TEXT VARCHAR(100)
-                );
-                ''') 
+            if self.master_pass_get == self.MP:
+                try:
+                    self.cursor.execute(''' 
+                    CREATE TABLE PASSKEYS (
+                        SERVICE TEXT VARCHAR(100) NOT NULL,
+                        PASSWD TEXT VARCHAR(100)
+                    );
+                    ''') 
 
-            except:
-                pass
-            
-            self.main_menu()
-        else:
-            try:
-                self.error_label.pack()
+                except:
+                    pass
+                
+                self.main_menu()
+            else:
+                try:
+                    self.error_label.pack()
 
-            except:
-                pass
+                except:
+                    pass
 
     def add_to_db(self):
         self.service = self.service_entry.get()
