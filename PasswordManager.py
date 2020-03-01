@@ -1,4 +1,5 @@
 import sys
+import os
 from tkinter import *
 import sqlite3
 import bcrypt
@@ -62,8 +63,8 @@ class PasswordManager:
         self.label4 = Label(self.root, text = "Enter password")
         self.passw_entry = Entry(self.root, show = "*")
 
-        self.store_passw_btn2 = Button(self.root, text = "Store password", command = self.add_to_db)
-        
+        self.store_passw_btn2 = Button(self.root, text = "Store password", width = 15, command = self.add_to_db)
+        self.show_passwd_btn = Button(self.root, text = "Show password", command = self.show_password)
         self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
 # All passwd menu
@@ -75,14 +76,18 @@ class PasswordManager:
 
 # Cryptography
     def generate_key(self, service):
+        # Create keys directory
+        self.filename = "keys/" + service + '.key'
+        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
+        # Generating key and writing into the file
         self.key = Fernet.generate_key()
-        self.file = open(service + '.key', 'wb')
+        self.file = open(self.filename, 'wb')
         self.file.write(self.key)
         self.file.close()
         return self.key
 
     def get_key(self, service):
-        self.file = open(service + '.key', 'rb')
+        self.file = open('keys/' + service + '.key', 'rb')
         self.decrypt_key = self.file.read()
         self.file.close()
         return self.decrypt_key
@@ -248,6 +253,9 @@ class PasswordManager:
         self.root.clipboard_clear()
         self.root.clipboard_append(password)
 
+    def show_password(self):
+        pass
+
     def exit(self):
         self.conn.close()
         self.root.destroy()
@@ -279,9 +287,9 @@ class PasswordManager:
         self.service_entry.pack()
         self.label4.pack(pady = 6)
         self.passw_entry.pack()
-        self.store_passw_btn2.pack(pady = 5)
+        self.show_passwd_btn.pack(pady = 5)
         self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
-        self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
+        self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
 
     def all_passwd_menu(self):
         self.clear()
