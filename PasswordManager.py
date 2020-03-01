@@ -2,6 +2,7 @@ import sys
 from tkinter import *
 import sqlite3
 import bcrypt
+from cryptography.fernet import Fernet
 
 class PasswordManager:
     
@@ -18,8 +19,8 @@ class PasswordManager:
         try:
             self.conn = sqlite3.connect("password_manager.db")
         except:
-            pass
-        
+           pass
+
 # DB cursor
         self.cursor = self.conn.cursor()
 
@@ -71,6 +72,19 @@ class PasswordManager:
 
 # Get passwd menu
         self.back_btn2 = Button(self.root, text = "Back", width = 15, command = self.all_passwd_menu)
+
+# Cryptography
+    def generate_key(self, service):
+        self.key = Fernet.generate_key()
+        self.file = open(service + '.key', 'wb')
+        self.file.write(self.key)
+        self.file.close()
+
+    def get_key(self, service):
+        self.file = open(service + '.key', 'rb')
+        self.decrypt_key = self.file.read()
+        self.file.close()
+        return self.decrypt_key
 
 # 2. COMMAND FUNCTIONS.
 
@@ -141,6 +155,9 @@ class PasswordManager:
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
 
+        # Generate crypto key for service
+        self.generate_key(self.service)
+
         self.command = "INSERT INTO PASSKEYS(SERVICE,PASSWD) VALUES(?,?);"
         self.cursor.execute(self.command, [self.service, self.password])
         self.conn.commit()
@@ -191,6 +208,7 @@ class PasswordManager:
     
         self.service = service[0]
         #print(self.service)
+        self.decrypt_key = self.get_key(self.service)
 
         self.query2 = "SELECT PASSWD FROM PASSKEYS WHERE SERVICE = ?;"
         self.cursor.execute(self.query2, [self.service])
