@@ -1,6 +1,7 @@
 import sys
 from tkinter import *
 import sqlite3
+import bcrypt
 
 class PasswordManager:
     
@@ -10,8 +11,6 @@ class PasswordManager:
     #######################################################################
     #                        LABELS AND BUTTONS                           #     
     #######################################################################
-
-        self.ADMIN_PASSWORD = "1234"
 
         self.root=root
 
@@ -35,7 +34,6 @@ class PasswordManager:
                 MP TEXT VARCHAR(100) NOT NULL
             );
             ''') 
-
         except:
             pass
 
@@ -47,7 +45,6 @@ class PasswordManager:
         self.error_label = Label(self.root, text = "Wrong Password!")
 
         self.MP_check()
-        #self.Access_check()
 
 # MAIN MENU
         self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
@@ -89,31 +86,38 @@ class PasswordManager:
         elif self.results_lenght == 1:
             self.Access_check()
         else:
-            print(self.results_lenght)
+            print("You currently have " + str(self.results_lenght) + " Master Passwords assigned!")
 
     def add_MP_to_db(self):
         self.MPget = self.MP.get()
-        print(self.MPget)
+        self.bMPget = self.MPget.encode('utf-8')
+        #print(self.bMPget)
+
+        #passwd hashing
+        self.MP_hashed = bcrypt.hashpw(self.bMPget, bcrypt.gensalt())
 
         self.MPinsertQuery = "INSERT INTO MasterPasswd(MP) VALUES(?);"
-        self.cursor.execute(self.MPinsertQuery, [self.MPget])
+        self.cursor.execute(self.MPinsertQuery, [self.MP_hashed])
         self.conn.commit()
 
         self.MP_check()
 
     def submit(self):
         self.master_pass_get = self.master_pass.get()
+        self.b_master_pass_get = self.master_pass_get.encode('utf-8')
        
         self.MP_get_query = "SELECT * FROM MasterPasswd;"
         self.cursor.execute(self.MP_get_query)
         
         self.results = self.cursor.fetchall()
 
-        for MP in self.results:
-            self.MP = MP[0]
-            print(self.MP)
-            
-            if self.master_pass_get == self.MP:
+        for MP_hashed in self.results:
+            self.MP_hashed = MP_hashed[0]
+            #print(self.MP_hashed)
+            self.MP_hash_check = bcrypt.checkpw(self.b_master_pass_get, self.MP_hashed)
+            #print(self.MP_hash_check)
+
+            if self.MP_hash_check:
                 try:
                     self.cursor.execute(''' 
                     CREATE TABLE PASSKEYS (
@@ -147,10 +151,13 @@ class PasswordManager:
 
         #self.results = self.cursor.fetchall()
 
-        #if self.service in self.results:
-            #self.error_label2.pack()
-        #else:
-            #pass
+        #for x in self.results:
+        #    self.x = x[0]
+        #    print("jajebix" + str(self.x))
+        #    if self.x == self.service_entry.get():
+        #        self.error_label2.pack()
+        #    else:
+        #        pass
 
         self.all_passwd_menu()
 
@@ -181,7 +188,7 @@ class PasswordManager:
 
     def get_passwd(self, service):
         self.clear()
-
+    
         self.service = service[0]
         #print(self.service)
 
