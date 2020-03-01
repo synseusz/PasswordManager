@@ -79,6 +79,7 @@ class PasswordManager:
         self.file = open(service + '.key', 'wb')
         self.file.write(self.key)
         self.file.close()
+        return self.key
 
     def get_key(self, service):
         self.file = open(service + '.key', 'rb')
@@ -105,7 +106,6 @@ class PasswordManager:
     def add_MP_to_db(self):
         self.MPget = self.MP.get()
         self.bMPget = self.MPget.encode('utf-8')
-        #print(self.bMPget)
 
         #passwd hashing
         self.MP_hashed = bcrypt.hashpw(self.bMPget, bcrypt.gensalt())
@@ -127,9 +127,8 @@ class PasswordManager:
 
         for MP_hashed in self.results:
             self.MP_hashed = MP_hashed[0]
-            #print(self.MP_hashed)
+
             self.MP_hash_check = bcrypt.checkpw(self.b_master_pass_get, self.MP_hashed)
-            #print(self.MP_hash_check)
 
             if self.MP_hash_check:
                 try:
@@ -154,12 +153,20 @@ class PasswordManager:
     def add_to_db(self):
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
-
+        
         # Generate crypto key for service
-        self.generate_key(self.service)
+        self.crypto_key = self.generate_key(self.service)
+        
+        # Encode password
+        self.encoded_passwd = self.password.encode('utf-8')
+
+        # Encrypt password
+        self.f = Fernet(self.crypto_key)
+        self.encrypted_passwd = self.f.encrypt(self.encoded_passwd)
 
         self.command = "INSERT INTO PASSKEYS(SERVICE,PASSWD) VALUES(?,?);"
-        self.cursor.execute(self.command, [self.service, self.password])
+        self.cursor.execute(self.command, [self.service, self.encrypted_passwd])
+
         self.conn.commit()
 
         # Unique service name check
@@ -207,7 +214,8 @@ class PasswordManager:
         self.clear()
     
         self.service = service[0]
-        #print(self.service)
+
+        # Get crypto key for service        
         self.decrypt_key = self.get_key(self.service)
 
         self.query2 = "SELECT PASSWD FROM PASSKEYS WHERE SERVICE = ?;"
@@ -222,18 +230,23 @@ class PasswordManager:
         print(self.string + str(self.results))
 
         for password in self.results:
-            self.passwd_label = Label(self.root, text = password, font = ("Helvetica", 15, "bold"))
+            self.password = password[0]
+
+            # Decrypt encrypted passwd 
+            self.f2 = Fernet(self.decrypt_key)
+            self.decrypted_passw = self.f2.decrypt(self.password)
+
+            self.passwd_label = Label(self.root, text = self.decrypted_passw, font = ("Helvetica", 15, "bold"))
             self.passwd_label.pack(pady = 4)
-            self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=password: self.copy_to_clipboard(pw))
+            self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=self.decrypted_passw: self.copy_to_clipboard(pw))
             self.copy_btn.pack()
             
         self.back_btn2.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
     
     def copy_to_clipboard(self, password):
-        self.password = password[0]
         self.root.clipboard_clear()
-        self.root.clipboard_append(self.password)
+        self.root.clipboard_append(password)
 
     def exit(self):
         self.conn.close()
