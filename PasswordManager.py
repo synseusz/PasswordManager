@@ -288,6 +288,8 @@ class PasswordManager:
         self.exit_btn.pack(pady = 10)
 
     def store_passwd_menu(self):
+        self.passw_entry['show'] = "*"
+        self.show_passwd_btn['text'] = "Show Password"
         self.clear()
         self.clear_entries()
         self.label3.pack(padx = 10, pady = 10)
