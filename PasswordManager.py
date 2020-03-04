@@ -254,7 +254,13 @@ class PasswordManager:
         self.root.clipboard_append(password)
 
     def show_password(self):
-        pass
+        if self.passw_entry['show'] == "":
+            self.show_passwd_btn['text'] = "Show Password"
+            self.passw_entry['show'] = "*"
+        else:
+            self.show_passwd_btn['text'] = "Hide Password"
+            self.passw_entry['show'] = ""
+
 
     def exit(self):
         self.conn.close()
@@ -283,6 +289,7 @@ class PasswordManager:
 
     def store_passwd_menu(self):
         self.clear()
+        self.clear_entries()
         self.label3.pack(padx = 10, pady = 10)
         self.service_entry.pack()
         self.label4.pack(pady = 6)
@@ -306,6 +313,11 @@ class PasswordManager:
         for w in self.all_widgets:
             w.pack_forget()
 
+# CLEAR ENTRIES
+
+    def clear_entries(self):
+        self.service_entry.delete(0, "end")
+        self.passw_entry.delete(0, "end")
 
     #######################################################################
     #                             MAIN CONFIG                             #
