@@ -65,7 +65,7 @@ class PasswordManager:
 
         self.store_passw_btn2 = Button(self.root, text = "Store password", width = 15, command = self.add_to_db)
         self.show_passwd_btn = Button(self.root, text = "Show password", command = self.show_password)
-        self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
+        #self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
 # All passwd menu
         self.label5 = Label(self.root, text = "Password Storage", font = ("Arial", 14, "bold"))
@@ -232,6 +232,7 @@ class PasswordManager:
         self.label6 = Label(self.root, text = self.string)
         self.label6.pack()
 
+
         print(self.string + str(self.results))
 
         for password in self.results:
@@ -245,6 +246,8 @@ class PasswordManager:
             self.passwd_label.pack(pady = 4)
             self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=self.decrypted_passw: self.copy_to_clipboard(pw))
             self.copy_btn.pack()
+            self.delete_passwd_btn = Button(self.root, text = "Delete", width = 15, command = lambda enc_pw = self.password: self.delete_passwd(enc_pw, self.service))
+            self.delete_passwd_btn.pack()
             
         self.back_btn2.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
@@ -260,6 +263,22 @@ class PasswordManager:
         else:
             self.show_passwd_btn['text'] = "Hide Password"
             self.passw_entry['show'] = ""
+
+    def delete_passwd(self, password, service):
+        print(password)
+        print(service)
+        self.delete_query = "DELETE FROM PASSKEYS WHERE PASSWD = ?;"
+        self.cursor.execute(self.delete_query, [password])
+
+        self.conn.commit()
+
+        self.label_text = "Password for %s has been successfully deleted"%(service)
+        self.delete_passwd_label = Label(self.root, text = self.label_text)
+        self.delete_passwd_label.pack()
+
+
+        # TO BE ADDED - REMOVE KEY FILE ON PASSWD DELETION FUNCTION
+
 
 
     def exit(self):
