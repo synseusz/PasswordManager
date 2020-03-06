@@ -4,6 +4,9 @@ from tkinter import *
 import sqlite3
 import bcrypt
 from cryptography.fernet import Fernet
+import string
+from random import *
+
 
 class PasswordManager:
     
@@ -53,6 +56,8 @@ class PasswordManager:
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
         self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
+        self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = self.generate_passwd)
+
         self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
 
 
@@ -277,13 +282,16 @@ class PasswordManager:
             # REMOVE KEY FILE IF EXISTS
             self.remove_key(service)
 
-            self.label_text = "Password for %s has been successfully deleted"%(service)
-            self.delete_passwd_label = Label(self.root, text = self.label_text)
-            self.delete_passwd_label.pack(side = TOP)
+            # CHANGE PASSWD LABEL INTO A MESSAGE
+            self.passwd_label['text'] = "Password has been deleted!"
 
         except:
             print("Unable to delete password")
 
+    def generate_passwd(self):
+        self.special_chars = ['!', '?', '@']
+        self.char_list = string.ascii_letters + string.digits + self.special_chars
+        self.generated_passwd = "".join(choice(self.char_list)) for x in range(randint(8, 16))
 
     def exit(self):
         self.conn.close()
@@ -308,6 +316,7 @@ class PasswordManager:
         self.label2.pack(padx = 10, pady = 10)
         self.store_passw_btn.pack()
         self.get_passw_btn.pack()
+        self.generate_passwd_btn.pack()
         self.exit_btn.pack(pady = 10)
 
     def store_passwd_menu(self):
