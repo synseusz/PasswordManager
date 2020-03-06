@@ -92,6 +92,12 @@ class PasswordManager:
         self.file.close()
         return self.decrypt_key
 
+    def remove_key(self, service):
+        if os.path.exists("keys/" + service + ".key"):
+            os.remove("keys/" + service + ".key")
+        else:
+            print("The key file for this password does not exist")
+
 # 2. COMMAND FUNCTIONS.
 
     def MP_check(self):
@@ -207,10 +213,8 @@ class PasswordManager:
 
         self.results = self.cursor.fetchall()
         self.results_length = len(self.results)
-        print(self.results)
 
         for service in self.results:
-            print("elko2" + str(service))
             self.service_btn = Button(self.root, text = service, width = 50, command = lambda s=service: self.get_passwd(s))
             self.service_btn.pack(pady = 4)
 
@@ -265,20 +269,20 @@ class PasswordManager:
             self.passw_entry['show'] = ""
 
     def delete_passwd(self, password, service):
-        print(password)
-        print(service)
         self.delete_query = "DELETE FROM PASSKEYS WHERE PASSWD = ?;"
-        self.cursor.execute(self.delete_query, [password])
+        try:
+            self.cursor.execute(self.delete_query, [password])
+            self.conn.commit()
 
-        self.conn.commit()
+            # REMOVE KEY FILE IF EXISTS
+            self.remove_key(service)
 
-        self.label_text = "Password for %s has been successfully deleted"%(service)
-        self.delete_passwd_label = Label(self.root, text = self.label_text)
-        self.delete_passwd_label.pack()
+            self.label_text = "Password for %s has been successfully deleted"%(service)
+            self.delete_passwd_label = Label(self.root, text = self.label_text)
+            self.delete_passwd_label.pack(side = TOP)
 
-
-        # TO BE ADDED - REMOVE KEY FILE ON PASSWD DELETION FUNCTION
-
+        except:
+            print("Unable to delete password")
 
 
     def exit(self):
