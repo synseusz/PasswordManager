@@ -56,7 +56,7 @@ class PasswordManager:
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
         self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
-        self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = self.generate_passwd)
+        self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = self.generate_passwd_view)
 
         self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
 
@@ -78,6 +78,7 @@ class PasswordManager:
 
 # Get passwd menu
         self.back_btn2 = Button(self.root, text = "Back", width = 15, command = self.all_passwd_menu)
+
 
 # Cryptography
     def generate_key(self, service):
@@ -289,9 +290,19 @@ class PasswordManager:
             print("Unable to delete password")
 
     def generate_passwd(self):
-        self.special_chars = ['!', '?', '@']
-        self.char_list = string.ascii_letters + string.digits + self.special_chars
-        self.generated_passwd = "".join(choice(self.char_list)) for x in range(randint(8, 16))
+        # Generating passwd
+        self.special_chars = ("!" + "?" + "@" + "&") * 2
+        self.char_list = string.ascii_letters + string.digits + str(self.special_chars)
+
+        self.x = ""
+        self.generated_passwd = self.x.join(choice(self.char_list) for x in range(randint(8, 16)))
+
+        return self.generated_passwd
+
+    def reroll_generated_passwd(self):
+        self.new_passwd = self.generate_passwd()
+
+        self.generated_passwd_label['text'] = self.new_passwd
 
     def exit(self):
         self.conn.close()
@@ -339,6 +350,25 @@ class PasswordManager:
         self.get_services()
         self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
+
+    def generate_passwd_view(self):
+        self.clear()
+
+        self.generated_passwd = self.generate_passwd()
+
+        self.label7 = Label(self.root, text = "Generated Password:")
+        self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
+        self.copy_generated_passwd_btn = Button(self.root, text = "Copy to Clipboard", command = lambda pw=self.generated_passwd: self.copy_to_clipboard(pw))
+        self.reroll_btn = Button(self.root, text = "Re-roll", command = self.reroll_generated_passwd)
+        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = self.store_passwd_menu)
+
+        # pack
+        self.label7.pack()
+        self.generated_passwd_label.pack()
+        self.copy_generated_passwd_btn.pack()
+        self.reroll_btn.pack()
+        self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
+        self.add_to_storage_btn.pack(side = RIGHT, padx = 10, pady = 10)
 
 
 # CLEAR ALL CURRENTLY DISPLAYED WIDGETS
