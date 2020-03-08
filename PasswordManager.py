@@ -31,10 +31,11 @@ class PasswordManager:
 # MASTER PASSWORD SETUP
         self.MPsetupLabel = Label(self.root, text = "Setup your new Master Password")
         self.MP = Entry(self.root, show = '*', width = 35)
-        self.MPsubmit = Button(self.root, text = "Submit", command = self.add_MP_to_db)
+        self.MP.bind('<Return>', self.add_MP_to_db)
+        self.MPsubmit = Button(self.root, text = "Submit", command = lambda e="btn_click": self.add_MP_to_db(e))
 
         try:
-            self.cursor.execute(''' 
+            self.cursor.execute('''
             CREATE TABLE MasterPasswd (
                 MP TEXT VARCHAR(100) NOT NULL
             );
@@ -46,7 +47,8 @@ class PasswordManager:
         self.label1 = Label(self.root, text = "Please enter master password to gain access")
 
         self.master_pass = Entry(self.root, show = '*', width = 35)
-        self.submit_button = Button(self.root, text = "Submit", command = self.submit)
+        self.master_pass.bind('<Return>', self.submit)
+        self.submit_button = Button(self.root, text = "Submit", command = lambda e="btn_click": self.submit(e))
         self.error_label = Label(self.root, text = "Wrong Password!")
 
         self.MP_check()
@@ -120,7 +122,7 @@ class PasswordManager:
         else:
             print("You currently have " + str(self.results_lenght) + " Master Passwords assigned!")
 
-    def add_MP_to_db(self):
+    def add_MP_to_db(self, event):
         self.MPget = self.MP.get()
         self.bMPget = self.MPget.encode('utf-8')
 
@@ -133,7 +135,7 @@ class PasswordManager:
 
         self.MP_check()
 
-    def submit(self):
+    def submit(self, event):
         self.master_pass_get = self.master_pass.get()
         self.b_master_pass_get = self.master_pass_get.encode('utf-8')
        
@@ -168,6 +170,7 @@ class PasswordManager:
                     pass
 
     def add_to_db(self):
+                 
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
         
@@ -330,11 +333,17 @@ class PasswordManager:
         self.generate_passwd_btn.pack()
         self.exit_btn.pack(pady = 10)
 
-    def store_passwd_menu(self):
+    def store_passwd_menu(self, generated_passwd):
         self.passw_entry['show'] = "*"
         self.show_passwd_btn['text'] = "Show Password"
         self.clear()
         self.clear_entries()
+
+        if generated_passwd:
+            print("test1")
+        else:
+            print("test2")
+
         self.label3.pack(padx = 10, pady = 10)
         self.service_entry.pack()
         self.label4.pack(pady = 6)
@@ -360,7 +369,7 @@ class PasswordManager:
         self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
         self.copy_generated_passwd_btn = Button(self.root, text = "Copy to Clipboard", command = lambda pw=self.generated_passwd: self.copy_to_clipboard(pw))
         self.reroll_btn = Button(self.root, text = "Re-roll", command = self.reroll_generated_passwd)
-        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = self.store_passwd_menu)
+        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.generated_passwd: self.store_passwd_menu(pw))
 
         # pack
         self.label7.pack()
