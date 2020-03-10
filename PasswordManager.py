@@ -56,7 +56,7 @@ class PasswordManager:
 # MAIN MENU
         self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
 
-        self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = self.store_passwd_menu)
+        self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = lambda pw="None": self.store_passwd_menu(pw))
         self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
         self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = self.generate_passwd_view)
 
@@ -334,23 +334,33 @@ class PasswordManager:
         self.exit_btn.pack(pady = 10)
 
     def store_passwd_menu(self, generated_passwd):
-        self.passw_entry['show'] = "*"
-        self.show_passwd_btn['text'] = "Show Password"
         self.clear()
         self.clear_entries()
 
-        if generated_passwd:
-            print("test1")
+        if generated_passwd == "None":
+            self.passw_entry['show'] = "*"
+            self.show_passwd_btn['text'] = "Show Password"
+            self.label3.pack(padx = 10, pady = 10)
+            self.service_entry.pack()
+            self.label4.pack(pady = 6)
+            self.passw_entry.pack()
+            self.show_passwd_btn.pack(pady = 5)
+            self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
+            self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
+            print("Z menu")
         else:
-            print("test2")
+            print("Z generatora")
+            self.passw_entry['show'] = ""
+            self.show_passwd_btn['text'] = "Hide Password"
+            self.label3.pack(padx = 10, pady = 10)
+            self.service_entry.pack()
+            self.label4.pack(pady = 6)
+            self.passw_entry.pack()
+            self.passw_entry.insert(0, generated_passwd)
+            self.show_passwd_btn.pack(pady = 5)
+            self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
+            self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
 
-        self.label3.pack(padx = 10, pady = 10)
-        self.service_entry.pack()
-        self.label4.pack(pady = 6)
-        self.passw_entry.pack()
-        self.show_passwd_btn.pack(pady = 5)
-        self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
-        self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
 
     def all_passwd_menu(self):
         self.clear()
