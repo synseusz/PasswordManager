@@ -304,8 +304,8 @@ class PasswordManager:
 
     def reroll_generated_passwd(self):
         self.new_passwd = self.generate_passwd()
-
         self.generated_passwd_label['text'] = self.new_passwd
+
 
     def exit(self):
         self.conn.close()
@@ -336,6 +336,8 @@ class PasswordManager:
     def store_passwd_menu(self, generated_passwd):
         self.clear()
         self.clear_entries()
+        print("here is the password that gets passed further")
+        print(generated_passwd)
 
         if generated_passwd == "None":
             self.passw_entry['show'] = "*"
@@ -379,7 +381,13 @@ class PasswordManager:
         self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
         self.copy_generated_passwd_btn = Button(self.root, text = "Copy to Clipboard", command = lambda pw=self.generated_passwd: self.copy_to_clipboard(pw))
         self.reroll_btn = Button(self.root, text = "Re-roll", command = self.reroll_generated_passwd)
-        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.generated_passwd: self.store_passwd_menu(pw))
+        self.get_most_recent_passwd = self.generated_passwd_label['text']
+        print(self.get_most_recent_passwd)
+        
+        # to be progressed further
+
+        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.get_most_recent_passwd: self.store_passwd_menu(pw))
+
 
         # pack
         self.label7.pack()
