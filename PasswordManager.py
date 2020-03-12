@@ -250,14 +250,15 @@ class PasswordManager:
 
         for password in self.results:
             self.password = password[0]
-
+            
             # Decrypt encrypted passwd 
             self.f2 = Fernet(self.decrypt_key)
             self.decrypted_passw = self.f2.decrypt(self.password)
+            self.decoded_password = self.decrypted_passw.decode()
 
             self.passwd_label = Label(self.root, text = self.decrypted_passw, font = ("Helvetica", 15, "bold"))
             self.passwd_label.pack(pady = 4)
-            self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=self.decrypted_passw: self.copy_to_clipboard(pw))
+            self.copy_btn = Button(self.root, text = "Copy to Clipboard", width = 15, command = lambda pw=self.decoded_password: self.copy_to_clipboard(pw))
             self.copy_btn.pack()
             self.delete_passwd_btn = Button(self.root, text = "Delete", width = 15, command = lambda enc_pw = self.password: self.delete_passwd(enc_pw, self.service))
             self.delete_passwd_btn.pack()
@@ -266,6 +267,9 @@ class PasswordManager:
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
     
     def copy_to_clipboard(self, password):
+        print("thats passwd that gets passed to clipboard")
+        print(password)
+        
         self.root.clipboard_clear()
         self.root.clipboard_append(password)
 
@@ -299,13 +303,16 @@ class PasswordManager:
 
         self.x = ""
         self.generated_passwd = self.x.join(choice(self.char_list) for x in range(randint(8, 16)))
-
+        print("Generated password format")
+        print(self.generated_passwd)
         return self.generated_passwd
 
     def reroll_generated_passwd(self):
         self.new_passwd = self.generate_passwd()
         self.generated_passwd_label['text'] = self.new_passwd
 
+        self.copy_generated_passwd_btn['command'] = lambda pw=self.new_passwd: self.copy_to_clipboard(pw)
+        self.add_to_storage_btn['command'] = lambda pw=self.new_passwd: self.store_passwd_menu(pw) 
 
     def exit(self):
         self.conn.close()
@@ -381,13 +388,8 @@ class PasswordManager:
         self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
         self.copy_generated_passwd_btn = Button(self.root, text = "Copy to Clipboard", command = lambda pw=self.generated_passwd: self.copy_to_clipboard(pw))
         self.reroll_btn = Button(self.root, text = "Re-roll", command = self.reroll_generated_passwd)
-        self.get_most_recent_passwd = self.generated_passwd_label['text']
-        print(self.get_most_recent_passwd)
-        
-        # to be progressed further
 
-        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.get_most_recent_passwd: self.store_passwd_menu(pw))
-
+        self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.generated_passwd: self.store_passwd_menu(pw))
 
         # pack
         self.label7.pack()
