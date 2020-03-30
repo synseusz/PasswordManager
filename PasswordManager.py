@@ -58,7 +58,7 @@ class PasswordManager:
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = lambda pw="None": self.store_passwd_menu(pw))
         self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
-        self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = self.generate_passwd_view)
+        self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = lambda cv="Main Menu": self.generate_passwd_view(cv))
 
         self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
 
@@ -76,10 +76,7 @@ class PasswordManager:
 
 # All passwd menu
         self.label5 = Label(self.root, text = "Password Storage", font = ("Arial", 14, "bold"))
-        self.back_btn = Button(self.root, text = "Back", width = 15, command = self.main_menu)
-
-# Get passwd menu
-        self.back_btn2 = Button(self.root, text = "Back", width = 15, command = self.all_passwd_menu)
+        self.back_btn = Button(self.root, text = "Back", width = 15, command = lambda cv = "None": self.back(cv))
 
 
 # Cryptography
@@ -262,8 +259,11 @@ class PasswordManager:
             self.copy_btn.pack()
             self.delete_passwd_btn = Button(self.root, text = "Delete", width = 15, command = lambda enc_pw = self.password: self.delete_passwd(enc_pw, self.service))
             self.delete_passwd_btn.pack()
-            
-        self.back_btn2.pack(side = LEFT, padx = 10, pady = 10)
+
+        #Pass current view parameter to back function
+        self.back_btn['command'] = lambda cv = "Passwd View": self.back(cv)
+
+        self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
     
     def copy_to_clipboard(self, password):
@@ -312,7 +312,21 @@ class PasswordManager:
         self.generated_passwd_label['text'] = self.new_passwd
 
         self.copy_generated_passwd_btn['command'] = lambda pw=self.new_passwd: self.copy_to_clipboard(pw)
-        self.add_to_storage_btn['command'] = lambda pw=self.new_passwd: self.store_passwd_menu(pw) 
+        self.add_to_storage_btn['command'] = lambda pw=self.new_passwd: self.store_passwd_menu(pw)
+
+    def back(self, current_view):
+        if current_view == "Store Passwd Menu" or current_view == "Get Passwd Menu" or current_view == "Generate Passwd Menu":
+            self.main_menu()
+
+        elif current_view == "Passwd View":
+            self.all_passwd_menu()
+
+        elif current_view == "Store Generated Passwd View":
+            self.generate_passwd_view(current_view)
+
+        else:
+            print("Back function: Current view is:")
+            print(current_view)
 
     def exit(self):
         self.conn.close()
@@ -354,6 +368,7 @@ class PasswordManager:
             self.label4.pack(pady = 6)
             self.passw_entry.pack()
             self.show_passwd_btn.pack(pady = 5)
+            self.back_btn['command'] = lambda cv = "Store Passwd Menu": self.back(cv)
             self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
             self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
             print("Z menu")
@@ -367,6 +382,7 @@ class PasswordManager:
             self.passw_entry.pack()
             self.passw_entry.insert(0, generated_passwd)
             self.show_passwd_btn.pack(pady = 5)
+            self.back_btn['command'] = lambda cv = "Store Generated Passwd View": self.back(cv)
             self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
             self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
 
@@ -376,13 +392,17 @@ class PasswordManager:
         self.label5.pack()
         self.get_safe_status()
         self.get_services()
+        self.back_btn['command'] = lambda cv = "Get Passwd Menu": self.back(cv)
         self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
 
-    def generate_passwd_view(self):
+    def generate_passwd_view(self, current_view):
         self.clear()
 
-        self.generated_passwd = self.generate_passwd()
+        if current_view == "Main Menu":  
+            self.generated_passwd = self.generate_passwd()
+        else:
+            pass
 
         self.label7 = Label(self.root, text = "Generated Password:")
         self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
@@ -396,6 +416,7 @@ class PasswordManager:
         self.generated_passwd_label.pack()
         self.copy_generated_passwd_btn.pack()
         self.reroll_btn.pack()
+        self.back_btn['command'] = lambda cv = "Generate Passwd Menu": self.back(cv)
         self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
         self.add_to_storage_btn.pack(side = RIGHT, padx = 10, pady = 10)
 
