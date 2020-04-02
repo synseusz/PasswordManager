@@ -64,7 +64,6 @@ class PasswordManager:
 
 
 # Service & Password entries
-        self.label3 = Label(self.root, text = "What's the name of the service you'd like to store password for?")
         self.service_entry = Entry(self.root)
 
         self.label4 = Label(self.root, text = "Enter password")
@@ -170,37 +169,31 @@ class PasswordManager:
                  
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
+
+        if len(self.service) > 0:
         
-        # Generate crypto key for service
-        self.crypto_key = self.generate_key(self.service)
-        
-        # Encode password
-        self.encoded_passwd = self.password.encode('utf-8')
+            # Generate crypto key for service
+            self.crypto_key = self.generate_key(self.service)
+            
+            # Encode password
+            self.encoded_passwd = self.password.encode('utf-8')
 
-        # Encrypt password
-        self.f = Fernet(self.crypto_key)
-        self.encrypted_passwd = self.f.encrypt(self.encoded_passwd)
+            # Encrypt password
+            self.f = Fernet(self.crypto_key)
+            self.encrypted_passwd = self.f.encrypt(self.encoded_passwd)
 
-        self.command = "INSERT INTO PASSKEYS(SERVICE,PASSWD) VALUES(?,?);"
-        self.cursor.execute(self.command, [self.service, self.encrypted_passwd])
+            self.command = "INSERT INTO PASSKEYS(SERVICE,PASSWD) VALUES(?,?);"
+            self.cursor.execute(self.command, [self.service, self.encrypted_passwd])
+            self.conn.commit()
 
-        self.conn.commit()
+            self.all_passwd_menu()
 
-        # Unique service name check
-        #self.query = "SELECT SERVICE FROM PASSKEYS;"
-        #self.cursor.execute(self.query)
+        elif len(self.service) == 0:
+            self.label3['text'] = "Please enter the name of the service below!"
+            self.label3['fg'] = "red"
 
-        #self.results = self.cursor.fetchall()
-
-        #for x in self.results:
-        #    self.x = x[0]
-        #    print("jajebix" + str(self.x))
-        #    if self.x == self.service_entry.get():
-        #        self.error_label2.pack()
-        #    else:
-        #        pass
-
-        self.all_passwd_menu()
+        else:
+            print(len(self.service))
 
     def get_safe_status(self):
         self.get_safe_status_cmd = "SELECT SERVICE FROM PASSKEYS;"
@@ -338,12 +331,14 @@ class PasswordManager:
     def master_password_setup(self):
         self.MPsetupLabel.pack(pady = 5, padx=10)
         self.MP.pack(pady = 4)
+        self.MP.focus()
         self.MPsubmit.pack()
 
     def Access_check(self):
         self.clear()
         self.label1.pack(pady = 5, padx=10)
         self.master_pass.pack(pady = 4)
+        self.master_pass.focus()
         self.submit_button.pack(pady = 4)
 
     def main_menu(self):
@@ -357,14 +352,15 @@ class PasswordManager:
     def store_passwd_menu(self, generated_passwd):
         self.clear()
         self.clear_entries()
-        print("here is the password that gets passed further")
-        print(generated_passwd)
+
+        self.label3 = Label(self.root, text = "I would like to store a password for")
 
         if generated_passwd == "None":
             self.passw_entry['show'] = "*"
             self.show_passwd_btn['text'] = "Show Password"
             self.label3.pack(padx = 10, pady = 10)
             self.service_entry.pack()
+            self.service_entry.focus()
             self.label4.pack(pady = 6)
             self.passw_entry.pack()
             self.show_passwd_btn.pack(pady = 5)
@@ -378,6 +374,7 @@ class PasswordManager:
             self.show_passwd_btn['text'] = "Hide Password"
             self.label3.pack(padx = 10, pady = 10)
             self.service_entry.pack()
+            self.service_entry.focus()
             self.label4.pack(pady = 6)
             self.passw_entry.pack()
             self.passw_entry.insert(0, generated_passwd)
