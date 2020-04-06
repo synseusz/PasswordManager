@@ -170,7 +170,10 @@ class PasswordManager:
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
 
-        if len(self.service) > 0:
+        self.is_service_unique = self.unique_service_check(self.service)
+
+
+        if len(self.service) > 0 and self.is_service_unique == True:
         
             # Generate crypto key for service
             self.crypto_key = self.generate_key(self.service)
@@ -192,8 +195,29 @@ class PasswordManager:
             self.label3['text'] = "Please enter the name of the service below!"
             self.label3['fg'] = "red"
 
+        elif self.is_service_unique == False:
+            self.label3['text'] = "You already store a password for given service!"
+            self.label3['fg'] = "red"
+            
         else:
             print(len(self.service))
+
+
+    def unique_service_check(self, service):
+        self.s = service
+        
+        self.sql_cmd = "SELECT SERVICE FROM PASSKEYS;"
+        self.cursor.execute(self.sql_cmd)
+
+        self.results = self.cursor.fetchall()
+        
+        for service in self.results:
+            self.x = service[0]
+            if self.s == self.x:
+                return False
+            else:
+                return True
+
 
     def get_safe_status(self):
         self.get_safe_status_cmd = "SELECT SERVICE FROM PASSKEYS;"
@@ -236,8 +260,6 @@ class PasswordManager:
         self.label6.pack()
 
 
-        print(self.string + str(self.results))
-
         for password in self.results:
             self.password = password[0]
             
@@ -259,10 +281,7 @@ class PasswordManager:
         self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
         self.exit_btn.pack(side = RIGHT, padx = 10, pady = 10)
     
-    def copy_to_clipboard(self, password):
-        print("thats passwd that gets passed to clipboard")
-        print(password)
-        
+    def copy_to_clipboard(self, password):  
         self.root.clipboard_clear()
         self.root.clipboard_append(password)
 
@@ -296,8 +315,6 @@ class PasswordManager:
 
         self.x = ""
         self.generated_passwd = self.x.join(choice(self.char_list) for x in range(randint(8, 16)))
-        print("Generated password format")
-        print(self.generated_passwd)
         return self.generated_passwd
 
     def reroll_generated_passwd(self):
@@ -358,24 +375,22 @@ class PasswordManager:
         if generated_passwd == "None":
             self.passw_entry['show'] = "*"
             self.show_passwd_btn['text'] = "Show Password"
-            self.label3.pack(padx = 10, pady = 10)
+            self.label3.pack(padx = 5, pady = 5)
             self.service_entry.pack()
             self.service_entry.focus()
-            self.label4.pack(pady = 6)
+            self.label4.pack(pady = 3)
             self.passw_entry.pack()
             self.show_passwd_btn.pack(pady = 5)
             self.back_btn['command'] = lambda cv = "Store Passwd Menu": self.back(cv)
             self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
             self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
-            print("Z menu")
         else:
-            print("Z generatora")
             self.passw_entry['show'] = ""
             self.show_passwd_btn['text'] = "Hide Password"
-            self.label3.pack(padx = 10, pady = 10)
+            self.label3.pack(padx = 5, pady = 5)
             self.service_entry.pack()
             self.service_entry.focus()
-            self.label4.pack(pady = 6)
+            self.label4.pack(pady = 3)
             self.passw_entry.pack()
             self.passw_entry.insert(0, generated_passwd)
             self.show_passwd_btn.pack(pady = 5)
@@ -437,7 +452,7 @@ class PasswordManager:
        
 def main():
     root = Tk()
-    gui = PasswordManager(root)
+    PasswordManager(root)
     root.wm_title("Password Manager")
     root.minsize(300,100)
     root.mainloop()
