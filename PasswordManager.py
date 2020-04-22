@@ -23,7 +23,7 @@ class PasswordManager:
         try:
             self.conn = sqlite3.connect("password_manager.db")
         except:
-           pass
+           print("Unable to create/connect with the database")
 
 # DB cursor
         self.cursor = self.conn.cursor()
@@ -41,6 +41,7 @@ class PasswordManager:
             );
             ''') 
         except:
+            #table already exists
             pass
 
 # MASTER PASSWORD PROMPT  
@@ -57,7 +58,7 @@ class PasswordManager:
         self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = lambda pw="None": self.store_passwd_menu(pw))
-        self.get_passw_btn = Button(self.root, text = "Get Password", width = 15, command = self.all_passwd_menu)
+        self.get_passw_btn = Button(self.root, text = "Password Storage", width = 15, command = self.all_passwd_menu)
         self.generate_passwd_btn = Button(self.root, text = "Generate Password", width = 15, command = lambda cv="Main Menu": self.generate_passwd_view(cv))
 
         self.exit_btn = Button(self.root, text = "Exit", width = 15, command = self.exit)
@@ -72,7 +73,6 @@ class PasswordManager:
 
         self.store_passw_btn2 = Button(self.root, text = "Store password", width = 15, command = lambda e="btn_click": self.add_to_db(e))
         self.show_passwd_btn = Button(self.root, text = "Show password", command = self.show_password)
-        #self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
 # All passwd menu
         self.label5 = Label(self.root, text = "Password Storage", font = ("Arial", 14, "bold"))
@@ -156,15 +156,12 @@ class PasswordManager:
                     ''') 
 
                 except:
+                    #table already exists
                     pass
                 
                 self.main_menu()
             else:
-                try:
-                    self.error_label.pack()
-
-                except:
-                    pass
+                self.error_label.pack()
 
     def add_to_db(self, event):
                  
@@ -413,7 +410,6 @@ class PasswordManager:
             self.back_btn.pack(side = LEFT, padx = 10, pady = 10)
             self.store_passw_btn2.pack(side = RIGHT, padx = 10, pady = 10)
 
-
     def all_passwd_menu(self):
         self.clear()
         self.label5.pack()
@@ -434,7 +430,7 @@ class PasswordManager:
         self.label7 = Label(self.root, text = "Generated Password:")
         self.generated_passwd_label = Label(self.root, text = self.generated_passwd, font = ("Helvetica", 15, "bold"))
         self.copy_generated_passwd_btn = Button(self.root, text = "Copy to Clipboard", command = lambda pw=self.generated_passwd: self.copy_to_clipboard(pw))
-        self.reroll_btn = Button(self.root, text = "Re-roll", command = self.reroll_generated_passwd)
+        self.reroll_btn = Button(self.root, text = "Re-roll", width = 14, command = self.reroll_generated_passwd)
 
         self.add_to_storage_btn = Button(self.root, text = "Add to storage", width = 15, command = lambda pw=self.generated_passwd: self.store_passwd_menu(pw))
 
