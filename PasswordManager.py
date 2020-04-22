@@ -68,8 +68,9 @@ class PasswordManager:
 
         self.label4 = Label(self.root, text = "Enter password")
         self.passw_entry = Entry(self.root, show = "*")
+        self.passw_entry.bind('<Return>', self.add_to_db)
 
-        self.store_passw_btn2 = Button(self.root, text = "Store password", width = 15, command = self.add_to_db)
+        self.store_passw_btn2 = Button(self.root, text = "Store password", width = 15, command = lambda e="btn_click": self.add_to_db(e))
         self.show_passwd_btn = Button(self.root, text = "Show password", command = self.show_password)
         #self.error_label2 = Label(self.root, text = "This service already has a password assigned!")
 
@@ -165,13 +166,12 @@ class PasswordManager:
                 except:
                     pass
 
-    def add_to_db(self):
+    def add_to_db(self, event):
                  
         self.service = self.service_entry.get()
         self.password = self.passw_entry.get()
 
         self.is_service_unique = self.unique_service_check(self.service)
-
 
         if len(self.service) > 0 and self.is_service_unique == True:
         
@@ -200,24 +200,39 @@ class PasswordManager:
             self.label3['fg'] = "red"
             
         else:
+            print("Entered service lenght")
             print(len(self.service))
+            print("Is the entered service unique?")
+            print(self.is_service_unique)
 
 
     def unique_service_check(self, service):
         self.s = service
-        
+        self.is_unique = ""
+
         self.sql_cmd = "SELECT SERVICE FROM PASSKEYS;"
         self.cursor.execute(self.sql_cmd)
 
         self.results = self.cursor.fetchall()
-        
-        for service in self.results:
-            self.x = service[0]
-            if self.s == self.x:
-                return False
-            else:
-                return True
+        self.number_of_services_stored = len(self.results)
 
+        if self.number_of_services_stored == 0:
+            self.is_unique = True
+            return self.is_unique
+
+        else:
+            for services in self.results:
+                self.x = services[0]
+                
+                if self.x == self.s:
+                    self.is_unique = False
+                    break
+                elif self.x != self.s:
+                    self.is_unique = True
+                else:
+                    print("is_unique value - ", str(self.is_unique))
+
+        return self.is_unique
 
     def get_safe_status(self):
         self.get_safe_status_cmd = "SELECT SERVICE FROM PASSKEYS;"
@@ -239,7 +254,7 @@ class PasswordManager:
 
         for service in self.results:
             self.service_btn = Button(self.root, text = service, width = 50, command = lambda s=service: self.get_passwd(s))
-            self.service_btn.pack(pady = 4)
+            self.service_btn.pack(pady=1)
 
 
     def get_passwd(self, service):
