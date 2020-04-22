@@ -55,7 +55,7 @@ class PasswordManager:
         self.MP_check()
 
 # MAIN MENU
-        self.label2 = Label(self.root, text = "Welcome to Password Manager!", font = ("Arial", 14, "bold"))
+        self.label2 = Label(self.root, text = "Password Manager", font = ("Arial", 14, "bold"))
 
         self.store_passw_btn = Button(self.root, text = "Store Password", width = 15, command = lambda pw="None": self.store_passwd_menu(pw))
         self.get_passw_btn = Button(self.root, text = "Password Storage", width = 15, command = self.all_passwd_menu)
@@ -67,7 +67,7 @@ class PasswordManager:
 # Service & Password entries
         self.service_entry = Entry(self.root)
 
-        self.label4 = Label(self.root, text = "Enter password")
+        self.label4 = Label(self.root, text = "Enter password:")
         self.passw_entry = Entry(self.root, show = "*")
         self.passw_entry.bind('<Return>', self.add_to_db)
 
@@ -382,7 +382,7 @@ class PasswordManager:
         self.clear()
         self.clear_entries()
 
-        self.label3 = Label(self.root, text = "I would like to store a password for")
+        self.label3 = Label(self.root, text = "I want to store a password for:")
 
         if generated_passwd == "None":
             self.passw_entry['show'] = "*"
